@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskEarn Pro BD - Final</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; min-height: 100vh; padding-bottom: 70px; }
+        
+        .panel-page { display: none; }
+        .panel-page.active { display: block; }
+
+        .app-top-header {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white; padding: 25px 20px;
+            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+        }
+        .user-welcome-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .user-avatar-area { display: flex; align-items: center; gap: 12px; }
+        .avatar-circle { width: 45px; height: 45px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        .balance-card-main {
+            background: white; color: #2d3436; margin: -20px 20px 15px 20px; padding: 20px;
+            border-radius: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .bal-title { font-size: 13px; color: #b2bec3; }
+        .bal-amount { font-size: 26px; font-weight: bold; color: #00b894; }
+        .btn-withdraw-pill {
+            background: #00b894; color: white; border: none; padding: 10px 20px;
+            border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px;
+        }
+
+        .dashboard-container { padding: 10px 20px; }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .menu-card {
+            background: white; padding: 20px; border-radius: 16px; text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03); cursor: pointer; border: 1px solid #eef2f3;
+        }
+        .menu-icon { font-size: 35px; margin-bottom: 8px; }
+        .menu-title { font-weight: bold; font-size: 15px; color: #2d3436; }
+        .menu-sub { color: #00b894; font-weight: bold; font-size: 13px; margin-top: 5px; }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white;
+            display: flex; justify-content: space-around; padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000;
+        }
+        .nav-item { text-align: center; cursor: pointer; color: #b2bec3; font-size: 12px; font-weight: bold; }
+        .nav-item.active { color: #00b894; }
+        .nav-item div { font-size: 20px; margin-bottom: 2px; }
+
+        .sub-top-header {
+            display: flex; align-items: center; padding: 15px 20px; background: white;
+            border-bottom: 1px solid #dfe6e9; font-size: 18px; font-weight: bold; color: #2d3436;
+        }
+        .back-arrow { font-size: 22px; margin-right: 15px; cursor: pointer; color: #00b894; }
+        .inner-content { padding: 20px; }
+        
+        .box-input, .box-select {
+            width: 100%; padding: 14px; border: 1px solid #dfe6e9; border-radius: 12px;
+            font-size: 15px; margin-bottom: 15px; background: white; outline: none;
+        }
+        .btn-action-primary {
+            width: 100%; padding: 15px; background: #00b894; color: white; border: none;
+            border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+
+        .info-card-notice {
+            background: #e8f8f5; border: 1px dashed #00b894; padding: 12px; border-radius: 12px;
+            font-size: 13px; color: #009432; margin-bottom: 15px; text-align: center;
+        }
+
+        .sub-history-box { margin-top: 20px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .sub-history-box h4 { margin-bottom: 10px; color: #2d3436; font-size: 15px; border-bottom: 2px solid #f1f2f6; padding-bottom: 6px; }
+        .history-row-item { padding: 10px 0; border-bottom: 1px solid #f1f2f6; font-size: 13px; }
+        .badge-pending { color: #e67e22; font-weight: bold; background: #fef5e7; padding: 3px 8px; border-radius: 6px; float: right; }
+
+        .form-box {
+            max-width: 400px; margin: 40px auto; background: white;
+            padding: 30px 20px; border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+
+        .admin-wrapper { padding: 20px; }
+        .admin-panel-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .admin-panel-card h3 { color: #00b894; margin-bottom: 10px; font-size: 15px; border-bottom: 2px solid #f1f2f6; padding-bottom: 5px; }
+        .admin-record-row { font-size: 13px; color: #2d3436; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #dfe6e9; display: flex; justify-content: space-between; align-items: center; }
+        .btn-success { background: #27ae60; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
+
+        .modal-bg-overlay {
+            display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 99999;
+        }
+        .modal-bg-overlay.active { display: flex !important; }
+        .modal-card-box { background: white; width: 90%; max-width: 380px; padding: 25px; border-radius: 20px; text-align: center; }
+        .modal-card-box h3 { margin-bottom: 15px; color: #2d3436; }
+        .modal-card-box input { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 10px; margin-bottom: 12px; font-size: 14px; outline: none; }
+        .modal-btn { width: 100%; padding: 12px; background: #00b894; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .modal-btn-close { background: #b2bec3; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- Login Page -->
+    <div id="pageLogin" class="panel-page active">
+        <div class="app-top-header" style="text-align: center; border-radius: 0;">
+            <h2>TaskEarn Pro BD</h2>
+            <p style="font-size: 13px; opacity: 0.9;">লগইন করলেই থাকছে ২০ টাকা ফ্রি বোনাস!</p>
+        </div>
+        <div class="form-box">
+            <input type="text" class="box-input" id="loginPhoneInput" placeholder="মোবাইল নম্বর দিন">
+            <input type="password" class="box-input" id="loginPassInput" placeholder="পাসওয়ার্ড দিন">
+            <button class="btn-action-primary" onclick="processLogin()">Login Now</button>
+            <div style="text-align: center; margin-top: 15px; font-size: 14px; color: #636e72;">
+                নতুন অ্যাকাউন্ট খুলতে চান? <span style="color: #00b894; font-weight: bold; cursor: pointer;" onclick="changeRoute('pageRegister')">Register</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="pageRegister" class="panel-page">
+        <div class="app-top-header" style="text-align: center; border-radius: 0;">
+            <h2>Sign Up</h2>
+            <p style="font-size: 13px; opacity: 0.9;">নতুন অ্যাকাউন্ট তৈরি করুন</p>
+        </div>
+        <div class="form-box">
+            <input type="text" class="box-input" id="regPhoneInput" placeholder="মোবাইল নম্বর দিন">
+            <input type="password" class="box-input" id="regPassInput" placeholder="পাসওয়ার্ড দিন">
+            <input type="password" class="box-input" id="regConfirmPassInput" placeholder="কনফার্ম পাসওয়ার্ড দিন">
+            <input type="text" class="box-input" id="regRefInput" placeholder="রেফার কোড দিন (যদি থাকে)">
+            <button class="btn-action-primary" onclick="processRegister()">Create Account</button>
+            <div style="text-align: center; margin-top: 15px; font-size: 14px; color: #636e72;">
+                আগে থেকেই অ্যাকাউন্ট আছে? <span style="color: #00b894; font-weight: bold; cursor: pointer;" onclick="changeRoute('pageLogin')">Login</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Home Page -->
+    <div id="pageHome" class="panel-page">
+        <div class="app-top-header">
+            <div class="user-welcome-box">
+                <div class="user-avatar-area">
+                    <div class="avatar-circle">👤</div>
+                    <div>
+                        <div style="font-size: 12px; opacity: 0.9;">Welcome Back,</div>
+                        <div style="font-weight: bold; font-size: 16px;" id="lblUserPhoneHeader">User</div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 12px; cursor:pointer;" onclick="openCustomModal('modalAdminLogin')">⚙️ Admin</div>
+            </div>
+            <div style="font-size: 12px; opacity: 0.9;">Today's Earnings: <span id="lblTodayEarn">৳ 0 BDT</span></div>
+        </div>
+
+        <div class="balance-card-main">
+            <div>
+                <div class="bal-title">Account Balance</div>
+                <div class="bal-amount" id="lblUserBalance">৳ 20.00 BDT</div>
+            </div>
+            <button class="btn-withdraw-pill" onclick="changeRoute('pageWithdraw')">Withdraw</button>
+        </div>
+
+        <div class="dashboard-container">
+            <div class="grid-menu">
+                <div class="menu-card" onclick="changeRoute('pageGmailSell')">
+                    <div class="menu-icon">📧</div>
+                    <div class="menu-title">Gmail Sell</div>
+                    <div class="menu-sub" id="lblGmailRate">৳ ১৫ / অ্যাকাউন্ট</div>
+                </div>
+
+                <div class="menu-card" onclick="changeRoute('pageTopup')" style="background: linear-gradient(135deg, #ff7675 0%, #fab1a0 100%); color: white;">
+                    <div class="menu-icon" style="color: white;">🔥</div>
+                    <div class="menu-title" style="color: white;">Free Fire Topup</div>
+                    <div class="menu-sub" style="color: #fff;">ইনস্ট্যান্ট টপআপ</div>
+                </div>
+            </div>
+
+            <div class="grid-menu">
+                <div class="menu-card" onclick="changeRoute('pagePromoteTask')" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); color: white;">
+                    <div class="menu-icon" style="color: white;">🚀</div>
+                    <div class="menu-title" style="color: white;">Promote Task</div>
+                    <div class="menu-sub" style="color: #fff;">টাস্ক কিনুন (৳৩/জন)</div>
+                </div>
+
+                <div class="menu-card" onclick="changeRoute('pageTaskSellMarket')">
+                    <div class="menu-icon">📋</div>
+                    <div class="menu-title">Task Market</div>
+                    <div class="menu-sub">টাস্ক কমপ্লিট করুন</div>
+                </div>
+            </div>
+
+            <div class="grid-menu">
+                <div class="menu-card" onclick="changeRoute('pageRefer')" style="background: linear-gradient(135deg, #e17055 0%, #fab1a0 100%); color: white; grid-column: span 2;">
+                    <div class="menu-icon" style="color: white;">👥</div>
+                    <div class="menu-title" style="color: white;">Refer & Earn</div>
+                    <div class="menu-sub" style="color: #fff;">প্রতি রেফারে ৳৫০ বোনাস</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet / Mine Page -->
+    <div id="pageWallet" class="panel-page">
+        <div class="sub-top-header">My Wallet & Profile</div>
+        <div class="inner-content">
+            <div style="background: white; padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <div style="font-size: 14px; color: #b2bec3;">Total Balance</div>
+                <div style="font-size: 28px; font-weight: bold; color: #00b894; margin: 5px 0;" id="lblWalletBalanceVal">৳ 20.00</div>
+                <button class="btn-action-primary" style="margin-top: 10px;" onclick="changeRoute('pageWithdraw')">Withdraw Money</button>
+            </div>
+
+            <div class="sub-history-box">
+                <h4>Recent Account Activity</h4>
+                <div id="containerWalletActivity" style="font-size: 13px; color: #636e72;">কোনো হিস্ট্রি নেই</div>
+            </div>
+            
+            <button class="btn-action-primary" style="background: #ff7675; margin-top: 20px;" onclick="processLogout()">Log Out</button>
+        </div>
+    </div>
+
+    <!-- Free Fire Topup Page -->
+    <div id="pageTopup" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageHome')">❮</span> Free Fire Top-up
+        </div>
+        <div class="inner-content">
+            <div class="info-card-notice">
+                🔥 পেমেন্ট নম্বর: বিকাশ <b>01306009282</b>, নগদ <b>01611072580</b> (সেন্ড মনি করে ট্রানজেকশন আইডি দিন)
+            </div>
+            <input type="text" class="box-input" placeholder="Free Fire Player UID দিন" id="inputFfUid">
+            <input type="text" class="box-input" placeholder="প্যাকেজ নাম (যেমন: ১১৫ ডায়মন্ড - ৯০ টাকা)" id="inputFfPkg">
+            <input type="text" class="box-input" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন" id="inputTopupSender">
+            <input type="text" class="box-input" placeholder="TrxID (ট্রানজেকশন আইডি)" id="inputTopupTrx">
+            <button class="btn-action-primary" onclick="submitTopupRecord()">Confirm Topup Request</button>
+
+            <div class="sub-history-box">
+                <h4>Topup History</h4>
+                <div id="containerTopupHistory" style="font-size: 13px; color: #636e72;">কোনো টপআপ হিস্ট্রি নেই</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promote Task Page -->
+    <div id="pagePromoteTask" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageHome')">❮</span> Promote Task (টাস্ক কিনুন)
+        </div>
+        <div class="inner-content">
+            <div class="info-card-notice">
+                🚀 প্রমোশন টাস্ক তৈরি করুন। প্রতি জন ইউজারের জন্য রেট <b>৳৩.০০ টাকা</b>।
+            </div>
+            <input type="text" class="box-input" placeholder="কাজের নাম বা শিরোনাম (যেমন: YouTube Subscribe)" id="inputPromoteTitle">
+            <input type="text" class="box-input" placeholder="কাজের লিংক (যেখানে ইউজার যাবে)" id="inputPromoteLink">
+            
+            <label style="font-size:13px; font-weight:bold; color:#2d3436; display:block; margin-bottom:5px;">কতজনের জন্য টাস্ক কিনতে চান?</label>
+            <select class="box-select" id="selectPromoteCount" onchange="calculatePromoteBudget()">
+                <option value="10">১০ জন (মোট খরচ: ৳৩০)</option>
+                <option value="20">২০ জন (মোট খরচ: ৳৬০)</option>
+                <option value="30">৩০ জন (মোট খরচ: ৳৯০)</option>
+                <option value="50">৫০ জন (মোট খরচ: ৳১৫০)</option>
+                <option value="100">১০০ জন (মোট খরচ: ৳৩০০)</option>
+            </select>
+            <div id="lblPromoteBudgetNotice" style="font-size: 14px; color: #00b894; margin-bottom: 15px; font-weight: bold;">মোট খরচ: ৳৩০ টাকা</div>
+            <button class="btn-action-primary" onclick="submitPromoteTask()">Publish Task Now</button>
+        </div>
+    </div>
+
+    <!-- Task Market Page -->
+    <div id="pageTaskSellMarket" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageHome')">❮</span> Task Market
+        </div>
+        <div class="inner-content">
+            <div class="info-card-notice">📌 নিচের লাইভ টাস্কগুলো সম্পন্ন করে প্রুফ জমা দিন।</div>
+            <div id="containerAvailableTasksForUser" style="font-size: 14px; color: #2d3436;">বর্তমানে কোনো টাস্ক উপলব্ধ নেই</div>
+        </div>
+    </div>
+
+    <!-- Task Execute Page -->
+    <div id="pageTaskExecute" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageTaskSellMarket')">❮</span> Complete Task
+        </div>
+        <div class="inner-content">
+            <div class="info-card-notice" id="lblTaskExecInfo">কাজের বিবরণ</div>
+            <div style="background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; border: 1px solid #dfe6e9;">
+                <p style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #2d3436;">টাস্ক লিংক:</p>
+                <a href="#" id="linkTaskDestination" target="_blank" style="color: #00b894; font-weight: bold; word-break: break-all;">লিংক</a>
+            </div>
+            <input type="text" class="box-input" placeholder="আপনার প্রুফ বা স্ক্রিনশট লিংক দিন" id="inputTaskProofLink">
+            <button class="btn-action-primary" onclick="submitUserTaskProof()">Submit Proof</button>
+        </div>
+    </div>
+
+    <!-- Gmail Sell Page -->
+    <div id="pageGmailSell" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageHome')">❮</span> Gmail Sell Submission
+        </div>
+        <div class="inner-content">
+            <div class="info-card-notice">📌 জিমেইল জমা দিন। অ্যাডমিন চেকের পর আপনার ব্যালেন্সে টাকা যোগ হবে।</div>
+            <input type="email" class="box-input" placeholder="আপনার জিমেইল অ্যাকাউন্ট দিন (Gmail)" id="inputGmailUser">
+            <input type="text" class="box-input" placeholder="পাসওয়ার্ড দিন" id="inputGmailPass">
+            <button class="btn-action-primary" onclick="submitGmailRecord()">Submit Gmail Account</button>
+
+            <div class="sub-history-box">
+                <h4>Gmail History</h4>
+                <div id="containerGmailHistory" style="font-size: 13px; color: #636e72;">কোনো জিমেইল হিস্ট্রি নেই</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refer Page -->
+    <div id="pageRefer" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageHome')">❮</span> Refer & Earn (৳৫০ Bonus)
+        </div>
+        <div class="inner-content">
+            <div class="info-card-notice">
+                👥 বন্ধু যখন আপনার রেফার কোড দিয়ে অ্যাকাউন্ট খুলবে এবং প্রথম উইথড্র করবে, তখন আপনি পাবেন <b>৳৫০ টাকা</b> বোনাস!
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px;">
+                <p style="font-size: 14px; color: #2d3436; margin-bottom: 10px; font-weight: bold;">আপনার ইউনিক রেফার কোড:</p>
+                <input type="text" class="box-input" id="inputMyReferCode" readonly style="text-align: center; background: #f1f2f6; font-weight: bold; font-size: 18px; color: #00b894;">
+                <button class="btn-action-primary" onclick="copyReferCode()">Copy My Refer Code</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Page -->
+    <div id="pageWithdraw" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageHome')">❮</span> Cashout / Withdrawal
+        </div>
+        <div class="inner-content">
+            <div class="info-card-notice">
+                📌 সর্বনিম্ন উত্তোলন ১০০ টাকা। প্রতি ১০০ টাকায় ১০ টাকা চার্জ কাটা হবে (যেমন: ১০০ টাকায় ৯০ টাকা, ১০০০ টাকায় ৯০০ টাকা)।
+            </div>
+            <select class="box-select" id="selectPayChannel">
+                <option value="bKash">বিকাশ (bKash)</option>
+                <option value="Nagad">নগদ (Nagad)</option>
+            </select>
+            
+            <input type="number" class="box-input" placeholder="উইথড্র অ্যামাউন্ট লিখুন (যেমন: 100, 500, 1000)" id="inputCashAmount" oninput="onWithdrawInputChanged()">
+            <div id="lblWithdrawNotice" style="font-size: 13px; color: #00b894; margin-bottom: 15px; font-weight: bold;"></div>
+
+            <input type="text" class="box-input" placeholder="আপনার বিকাশ / নগদ নম্বর" id="inputCashAcc">
+            <button class="btn-action-primary" onclick="submitCashoutRequest()">Submit Withdrawal Request</button>
+
+            <div class="sub-history-box">
+                <h4>Withdraw History</h4>
+                <div id="containerWithdrawHistory" style="font-size: 13px; color: #636e72;">কোনো উইথড্র হিস্ট্রি নেই</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Control Panel Page -->
+    <div id="pageAdmin" class="panel-page">
+        <div class="sub-top-header">
+            <span class="back-arrow" onclick="changeRoute('pageHome')">❮</span> Admin Control Panel
+        </div>
+        <div class="admin-wrapper">
+            
+            <div class="admin-panel-card" style="border: 2px dashed #00b894; background: #f7fbfd;">
+                <h3 style="color: #00b894;">🔐 Admin Security & Settings</h3>
+                <input type="password" class="box-input" placeholder="নতুন অ্যাডমিন পাসওয়ার্ড সেট করুন" id="inputAdminNewPass" style="margin-bottom: 8px;">
+                <input type="number" class="box-input" placeholder="জিমেইল প্রতি মূল্য (যেমন: 15)" id="inputAdminGmailPrice" style="margin-bottom: 8px;">
+                <button class="btn-action-primary" style="padding: 10px; font-size: 14px;" onclick="saveAdminSettingsLive()">Update Settings & Password</button>
+            </div>
+
+            <div class="admin-panel-card">
+                <h3>🚀 Promote Task Requests (Approve & Publish)</h3>
+                <div id="listAdminPromoteTasks">কোনো প্রমোট টাস্ক রিকোয়েস্ট নেই</div>
+            </div>
+
+            <div class="admin-panel-card">
+                <h3>📋 User Task Proofs (Complete & Add Balance)</h3>
+                <div id="listAdminTaskProofs">কোনো টাস্ক প্রুফ নেই</div>
+            </div>
+
+            <div class="admin-panel-card">
+                <h3>📧 Gmail Submissions (Complete & Add Balance)</h3>
+                <div id="listAdminGmails">কোনো জিমেইল নেই</div>
+            </div>
+
+            <div class="admin-panel-card">
+                <h3>🔥 Free Fire Topup Requests (Complete)</h3>
+                <div id="listAdminTopups">কোনো টপআপ রিকোয়েস্ট নেই</div>
+            </div>
+
+            <div class="admin-panel-card">
+                <h3>💸 Withdraw Requests (Complete & Give ৳50 Ref Bonus)</h3>
+                <div id="listAdminWithdraws">কোনো উইথড্র নেই</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav Bar -->
+    <div class="bottom-nav" id="bottomNavContainer">
+        <div class="nav-item active" onclick="changeRoute('pageHome')">
+            <div>🏠</div>Home
+        </div>
+        <div class="nav-item" onclick="changeRoute('pageRefer')">
+            <div>👥</div>Team / Refer
+        </div>
+        <div class="nav-item" onclick="changeRoute('pageWallet')">
+            <div>💰</div>Wallet
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modalAdminLogin" class="modal-bg-overlay">
+        <div class="modal-card-box">
+            <h3>🔐 Admin Security</h3>
+            <input type="password" id="inputModalAdminPass" placeholder="Enter Admin Password">
+            <button class="modal-btn" onclick="verifyAdminPassword()">Enter Panel</button>
+            <button class="modal-btn modal-btn-close" onclick="closeCustomModal('modalAdminLogin')">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let dbPromoteRequests = JSON.parse(localStorage.getItem('app_v27_promote_req')) || [];
+        let dbLiveTasks = JSON.parse(localStorage.getItem('app_v27_live_tasks')) || [];
+        let dbTaskProofs = JSON.parse(localStorage.getItem('app_v27_task_proofs')) || [];
+        let dbGmails = JSON.parse(localStorage.getItem('app_v27_gmails')) || [];
+        let dbTopups = JSON.parse(localStorage.getItem('app_v27_topups')) || [];
+        let dbWithdraws = JSON.parse(localStorage.getItem('app_v27_withdraws')) || [];
+        let dbUsers = JSON.parse(localStorage.getItem('app_v27_users')) || {};
+        
+        let dbGmailPrice = parseFloat(localStorage.getItem('app_v27_gmail_price')) || 15.00;
+        let dbAdminPass = localStorage.getItem('app_v27_admin_pass') || 'Momin@BD#987$Secure';
+
+        let activeUserPhone = localStorage.getItem('app_v27_active_user') || '';
+        let currentUserBal = parseFloat(localStorage.getItem('app_v27_user_bal'));
+        if (isNaN(currentUserBal)) {
+            currentUserBal = 20.00;
+            localStorage.setItem('app_v27_user_bal', currentUserBal);
+        }
+
+        let currentActiveTaskForExec = null;
+
+        function updatePaymentUI() {
+            document.getElementById('lblUserBalance').innerText = '৳ ' + currentUserBal.toFixed(2) + ' BDT';
+            document.getElementById('lblWalletBalanceVal').innerText = '৳ ' + currentUserBal.toFixed(2);
+            document.getElementById('lblGmailRate').innerText = '৳ ' + dbGmailPrice + ' / অ্যাকাউন্ট';
+            if(activeUserPhone) {
+                document.getElementById('lblUserPhoneHeader').innerText = 'ID: ' + activeUserPhone;
+            }
+        }
+        updatePaymentUI();
+
+        let registeredPhone = localStorage.getItem('app_v27_reg_phone');
+        let registeredPass = localStorage.getItem('app_v27_reg_pass');
+
+        if(activeUserPhone && registeredPhone && activeUserPhone === registeredPhone) {
+            document.getElementById('lblUserPhoneHeader').innerText = 'ID: ' + activeUserPhone;
+            document.getElementById('bottomNavContainer').style.display = 'flex';
+        } else {
+            localStorage.removeItem('app_v27_active_user');
+            activeUserPhone = '';
+            document.querySelectorAll('.panel-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('pageLogin').classList.add('active');
+            document.getElementById('bottomNavContainer').style.display = 'none';
+        }
+
+        function changeRoute(pageId) {
+            let checkPhone = localStorage.getItem('app_v27_active_user');
+            if (!checkPhone && pageId !== 'pageLogin' && pageId !== 'pageRegister') {
+                alert('⚠️ আগে আপনার অ্যাকাউন্ট দিয়ে লগইন করুন!');
+                document.querySelectorAll('.panel-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('pageLogin').classList.add('active');
+                document.getElementById('bottomNavContainer').style.display = 'none';
+                return;
+            }
+
+            document.querySelectorAll('.panel-page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            if(pageId === 'pageLogin' || pageId === 'pageRegister') {
+                document.getElementById('bottomNavContainer').style.display = 'none';
+            } else {
+                document.getElementById('bottomNavContainer').style.display = 'flex';
+            }
+
+            if(pageId === 'pageHome') updatePaymentUI();
+            if(pageId === 'pageWallet') updatePaymentUI();
+            if(pageId === 'pageGmailSell') { renderGmailHistory(); }
+            if(pageId === 'pageTopup') { renderTopupHistory(); }
+            if(pageId === 'pageWithdraw') { renderWithdrawHistory(); onWithdrawInputChanged(); }
+            if(pageId === 'pagePromoteTask') { calculatePromoteBudget(); }
+            if(pageId === 'pageRefer') { renderMyReferInfo(); }
+            if(pageId === 'pageTaskSellMarket') { renderAvailableTasksForUser(); }
+            if(pageId === 'pageAdmin') {
+                renderAdminDashboard();
+                document.getElementById('inputAdminNewPass').value = '';
+                document.getElementById('inputAdminGmailPrice').value = dbGmailPrice;
+            }
+        }
+
+        function calculatePromoteBudget() {
+            let count = parseInt(document.getElementById('selectPromoteCount').value);
+            let totalCost = count * 3;
+            document.getElementById('lblPromoteBudgetNotice').innerText = `মোট খরচ: ৳${totalCost} টাকা (${count} জন x ৳৩)`;
+        }
+
+        function submitPromoteTask() {
+            let title = document.getElementById('inputPromoteTitle').value.trim();
+            let link = document.getElementById('inputPromoteLink').value.trim();
+            let count = parseInt(document.getElementById('selectPromoteCount').value);
+            let totalCost = count * 3;
+
+            if(!title || !link) { alert('সবগুলো ঘর ও লিংক পূরণ করুন!'); return; }
+            if(totalCost > currentUserBal) { alert('টাস্ক কেনার জন্য পর্যাপ্ত ব্যালেন্স নেই!'); return; }
+
+            currentUserBal -= totalCost;
+            localStorage.setItem('app_v27_user_bal', currentUserBal);
+            updatePaymentUI();
+
+            dbPromoteRequests.push({ user: activeUserPhone, title: title, link: link, count: count, reward: 3.00 });
+            localStorage.setItem('app_v27_promote_req', JSON.stringify(dbPromoteRequests));
+
+            alert('প্রমোট টাস্ক রিকোয়েস্ট অ্যাডমিনের কাছে জমা হয়েছে!');
+            document.getElementById('inputPromoteTitle').value = '';
+            document.getElementById('inputPromoteLink').value = '';
+            changeRoute('pageHome');
+        }
+
+        function renderAvailableTasksForUser() {
+            let h = '';
+            dbLiveTasks.forEach((t, i) => {
+                h += `<div class="history-row-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px;">
+                    <div><b>${t.title}</b><br><small>রেওয়ার্ড: ৳${t.reward}</small></div>
+                    <button class="btn-success" onclick="openTaskExecution(${i})">Complete Task</button>
+                </div>`;
+            });
+            document.getElementById('containerAvailableTasksForUser').innerHTML = h !== '' ? h : 'বর্তমানে কোনো টাস্ক উপলব্ধ নেই';
+        }
+
+        function openTaskExecution(index) {
+            currentActiveTaskForExec = dbLiveTasks[index];
+            document.getElementById('lblTaskExecInfo').innerHTML = `📌 কাজ: <b>${currentActiveTaskForExec.title}</b><br>লিংকে ক্লিক করে কাজ সম্পন্ন করুন।`;
+            document.getElementById('linkTaskDestination').href = currentActiveTaskForExec.link;
+            document.getElementById('linkTaskDestination').innerText = currentActiveTaskForExec.link;
+            changeRoute('pageTaskExecute');
+        }
+
+        function submitUserTaskProof() {
+            let proof = document.getElementById('inputTaskProofLink').value.trim();
+            if(!proof) { alert('প্রুফ বা স্ক্রিনশট লিংক দিন!'); return; }
+
+            dbTaskProofs.push({ user: activeUserPhone, title: currentActiveTaskForExec.title, reward: currentActiveTaskForExec.reward, proof: proof });
+            localStorage.setItem('app_v27_task_proofs', JSON.stringify(dbTaskProofs));
+            alert('টাস্ক প্রুফ জমা হয়েছে!');
+            document.getElementById('inputTaskProofLink').value = '';
+            changeRoute('pageTaskSellMarket');
+        }
+
+        function submitGmailRecord() {
+            let u = document.getElementById('inputGmailUser').value;
+            let p = document.getElementById('inputGmailPass').value;
+            if(!u || !p) { alert('সবগুলো ঘর পূরণ করুন!'); return; }
+            dbGmails.push({ email: u, pass: p, user: activeUserPhone });
+            localStorage.setItem('app_v27_gmails', JSON.stringify(dbGmails));
+            alert('জিমেইল সফলভাবে জমা হয়েছে!');
+            changeRoute('pageHome');
+        }
+
+        function renderGmailHistory() {
+            let h = '';
+            dbGmails.filter(g => g.user === activeUserPhone).forEach(g => { h += `<div class="history-row-item"><span>${g.email}</span> <span class="badge-pending">Pending</span></div>`; });
+            document.getElementById('containerGmailHistory').innerHTML = h !== '' ? h : 'কোনো জিমেইল হিস্ট্রি নেই';
+        }
+
+        function submitTopupRecord() {
+            let uid = document.getElementById('inputFfUid').value;
+            let pkg = document.getElementById('inputFfPkg').value;
+            let sender = document.getElementById('inputTopupSender').value;
+            let trx = document.getElementById('inputTopupTrx').value;
+            if(!uid || !pkg || !sender || !trx) { alert('সবগুলো ঘর পূরণ করুন!'); return; }
+            dbTopups.push({ user: activeUserPhone, uid: uid, pkg: pkg, sender: sender, trx: trx });
+            localStorage.setItem('app_v27_topups', JSON.stringify(dbTopups));
+            alert('ফ্রি ফায়ার টপআপ রিকোয়েস্ট জমা হয়েছে!');
+            changeRoute('pageHome');
+        }
+
+        function renderTopupHistory() {
+            let h = '';
+            dbTopups.filter(t => t.user === activeUserPhone).forEach(t => {
+                h += `<div class="history-row-item"><span>UID: ${t.uid} | ${t.pkg}</span> <span class="badge-pending">Pending</span></div>`;
+            });
+            document.getElementById('containerTopupHistory').innerHTML = h !== '' ? h : 'কোনো টপআপ হিস্ট্রি নেই';
+        }
+
+        function processRegister() {
+            const phone = document.getElementById('regPhoneInput').value.trim();
+            const pass = document.getElementById('regPassInput').value;
+            const confirmPass = document.getElementById('regConfirmPassInput').value;
+            const inputRefCode = document.getElementById('regRefInput').value.trim();
+
+            if(!phone || !pass || !confirmPass) { alert('⚠️ সবগুলো ঘর পূরণ করুন!'); return; }
+            if(pass !== confirmPass) { alert('⚠️ পাসওয়ার্ড মিলেনি!'); return; }
+
+            let uniqueCode = 'REF-' + phone.slice(-4) + Math.floor(100 + Math.random() * 900);
+            let referredBy = '';
+            if(inputRefCode) {
+                for(let uPhone in dbUsers) {
+                    if(dbUsers[uPhone].myCode === inputRefCode) {
+                        referredBy = uPhone;
+                        break;
+                    }
+                }
+            }
+
+            dbUsers[phone] = { phone: phone, pass: pass, myCode: uniqueCode, referredBy: referredBy, balance: 20.00 };
+            localStorage.setItem('app_v27_users', JSON.stringify(dbUsers));
+
+            localStorage.setItem('app_v27_reg_phone', phone);
+            localStorage.setItem('app_v27_reg_pass', pass);
+            alert('রেজিস্ট্রেশন সফল হয়েছে! লগইন করলেই ২০ টাকা বোনাস পাবেন। আপনার রেফার কোড: ' + uniqueCode);
+            changeRoute('pageLogin');
+        }
+
+        function processLogin() {
+            const phone = document.getElementById('loginPhoneInput').value.trim();
+            const pass = document.getElementById('loginPassInput').value;
+            
+            let userObj = dbUsers[phone];
+            let savedPhone = localStorage.getItem('app_v27_reg_phone');
+            let savedPass = localStorage.getItem('app_v27_reg_pass');
+
+            if((userObj && userObj.pass === pass) || (phone === savedPhone && pass === savedPass)) {
+                localStorage.setItem('app_v27_active_user', phone);
+                activeUserPhone = phone;
+                
+                if(!dbUsers[phone]) {
+                    let uniqueCode = 'REF-' + phone.slice(-4) + '99';
+                    dbUsers[phone] = { phone: phone, myCode: uniqueCode, referredBy: '', balance: 20.00 };
+                    localStorage.setItem('app_v27_users', JSON.stringify(dbUsers));
+                }
+
+                updatePaymentUI();
+                alert('লগইন সফল হয়েছে!');
+                changeRoute('pageHome');
+            } else {
+                alert('⚠️ ভুল নম্বর বা পাসওয়ার্ড!');
+            }
+        }
+
+        function processLogout() {
+            localStorage.removeItem('app_v27_active_user');
+            activeUserPhone = '';
+            changeRoute('pageLogin');
+        }
+
+        function renderMyReferInfo() {
+            let currentUser = dbUsers[activeUserPhone];
+            if(currentUser) {
+                document.getElementById('inputMyReferCode').value = currentUser.myCode;
+            } else {
+                document.getElementById('inputMyReferCode').value = 'REF-9999';
+            }
+        }
+
+        function copyReferCode() {
+            let codeBox = document.getElementById('inputMyReferCode');
+            codeBox.select();
+            navigator.clipboard.writeText(codeBox.value);
+            alert('রেফার কোড কপি করা হয়েছে!');
+        }
+
+        function onWithdrawInputChanged() {
+            let amt = parseFloat(document.getElementById('inputCashAmount').value) || 0;
+            if (amt < 100) {
+                document.getElementById('lblWithdrawNotice').innerText = `⚠️ সর্বনিম্ন উত্তোলন ১০০ টাকা।`;
+                return;
+            }
+            let charge = Math.floor(amt / 100) * 10;
+            let netReceive = amt - charge;
+            document.getElementById('lblWithdrawNotice').innerText = `উইথড্র: ৳${amt} | চার্জ (প্রতি ১০০ টাকায় ১০ টাকা): ৳${charge} | আপনি পাবেন: ৳${netReceive}`;
+        }
+
+        function submitCashoutRequest() {
+            const channel = document.getElementById('selectPayChannel').value;
+            const accNum = document.getElementById('inputCashAcc').value;
+            const amountVal = parseFloat(document.getElementById('inputCashAmount').value);
+            
+            if(!accNum || isNaN(amountVal)) { alert('সবগুলো তথ্য দিন!'); return; }
+            if(amountVal < 100) { alert('সর্বনিম্ন ১০০ টাকা উইথড্র করতে হবে!'); return; }
+            if(amountVal > currentUserBal) { alert('পর্যাপ্ত ব্যালেন্স নেই!'); return; }
+
+            currentUserBal -= amountVal;
+            localStorage.setItem('app_v27_user_bal', currentUserBal);
+            updatePaymentUI();
+
+            let charge = Math.floor(amountVal / 100) * 10;
+            let netAmount = amountVal - charge;
+
+            dbWithdraws.push({ user: activeUserPhone, method: channel, account: accNum, amount: amountVal, net: netAmount, charge: charge });
+            localStorage.setItem('app_v27_withdraws', JSON.stringify(dbWithdraws));
+            alert('উইথড্র রিকোয়েস্ট জমা হয়েছে!');
+            changeRoute('pageWithdraw');
+        }
+
+        function renderWithdrawHistory() {
+            let h = '';
+            dbWithdraws.filter(w => w.user === activeUserPhone).forEach(w => {
+                h += `<div class="history-row-item"><span>অ্যামাউন্ট: ৳${w.amount} (চার্জ: ৳${w.charge}, পাবে: ৳${w.net}) - ${w.method} [${w.account}]</span> <span class="badge-pending">Pending</span></div>`;
+            });
+            document.getElementById('containerWithdrawHistory').innerHTML = h !== '' ? h : 'কোনো উইথড্র হিস্ট্রি নেই';
+        }
+
+        // Admin actions
+        function adminApprovePromote(i) {
+            let item = dbPromoteRequests[i];
+            dbLiveTasks.push(item);
+            localStorage.setItem('app_v27_live_tasks', JSON.stringify(dbLiveTasks));
+
+            dbPromoteRequests.splice(i, 1);
+            localStorage.setItem('app_v27_promote_req', JSON.stringify(dbPromoteRequests));
+            renderAdminDashboard();
+            alert('টাস্কটি লাইভ করা হয়েছে!');
+        }
+
+        function completeTaskProof(i) {
+            let item = dbTaskProofs[i];
+            if(item && item.user) {
+                if(item.user === activeUserPhone) {
+                    currentUserBal += item.reward;
+                    localStorage.setItem('app_v27_user_bal', currentUserBal);
+                    updatePaymentUI();
+                } else if(dbUsers[item.user]) {
+                    dbUsers[item.user].balance = (dbUsers[item.user].balance || 20.00) + item.reward;
+                    localStorage.setItem('app_v27_users', JSON.stringify(dbUsers));
+                }
+            }
+            dbTaskProofs.splice(i, 1);
+            localStorage.setItem('app_v27_task_proofs', JSON.stringify(dbTaskProofs));
+            renderAdminDashboard();
+            alert('টাস্ক কমপ্লিট করা হয়েছে!');
+        }
+
+        function completeGmail(i) {
+            let item = dbGmails[i];
+            if(item && item.user) {
+                if(item.user === activeUserPhone) {
+                    currentUserBal += dbGmailPrice;
+                    localStorage.setItem('app_v27_user_bal', currentUserBal);
+                    updatePaymentUI();
+                } else if(dbUsers[item.user]) {
+                    dbUsers[item.user].balance = (dbUsers[item.user].balance || 20.00) + dbGmailPrice;
+                    localStorage.setItem('app_v27_users', JSON.stringify(dbUsers));
+                }
+            }
+            dbGmails.splice(i, 1);
+            localStorage.setItem('app_v27_gmails', JSON.stringify(dbGmails));
+            renderAdminDashboard();
+            alert('জিমেইল কমপ্লিট করা হয়েছে!');
+        }
+
+        function completeTopup(i) {
+            dbTopups.splice(i, 1);
+            localStorage.setItem('app_v27_topups', JSON.stringify(dbTopups));
+            renderAdminDashboard();
+            alert('টপআপ রিকোয়েস্ট কমপ্লিট করা হয়েছে!');
+        }
+
+        function completeWithdraw(i) {
+            let wItem = dbWithdraws[i];
+            if(wItem && wItem.user) {
+                let uData = dbUsers[wItem.user];
+                if(uData && uData.referredBy) {
+                    let refPhone = uData.referredBy;
+                    if(dbUsers[refPhone]) {
+                        dbUsers[refPhone].balance = (dbUsers[refPhone].balance || 20.00) + 50.00;
+                        localStorage.setItem('app_v27_users', JSON.stringify(dbUsers));
+                    }
+                }
+            }
+            dbWithdraws.splice(i, 1);
+            localStorage.setItem('app_v27_withdraws', JSON.stringify(dbWithdraws));
+            renderAdminDashboard();
+            alert('উইথড্র কমপ্লিট করা হয়েছে এবং রেফারের একাউন্টে ৫০ টাকা বোনাস যোগ হয়েছে!');
+        }
+
+        function saveAdminSettingsLive() {
+            let newPass = document.getElementById('inputAdminNewPass').value.trim();
+            if(newPass) {
+                dbAdminPass = newPass;
+                localStorage.setItem('app_v27_admin_pass', dbAdminPass);
+            }
+            let newPrice = parseFloat(document.getElementById('inputAdminGmailPrice').value);
+            if(!isNaN(newPrice) && newPrice > 0) {
+                dbGmailPrice = newPrice;
+                localStorage.setItem('app_v27_gmail_price', dbGmailPrice);
+            }
+            updatePaymentUI();
+            alert('অ্যাডমিন সেটিংস এবং পাসওয়ার্ড আপডেট সফল হয়েছে!');
+        }
+
+        function openCustomModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+        function closeCustomModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+        function verifyAdminPassword() {
+            if(document.getElementById('inputModalAdminPass').value === dbAdminPass) {
+                closeCustomModal('modalAdminLogin');
+                changeRoute('pageAdmin');
+            } else { alert('ভুল পাসওয়ার্ড!'); }
+        }
+
+        function renderAdminDashboard() {
+            let pHtml = '';
+            dbPromoteRequests.forEach((pr, i) => {
+                pHtml += `<div class="admin-record-row">
+                    <div><b>User:</b> ${pr.user} <br><b>Title:</b> ${pr.title} <br><b>Link:</b> <a href="${pr.link}" target="_blank">${pr.link}</a></div>
+                    <button class="btn-success" onclick="adminApprovePromote(${i})">Approve & Publish</button>
+                </div>`;
+            });
+            document.getElementById('listAdminPromoteTasks').innerHTML = pHtml !== '' ? pHtml : 'কোনো প্রমোট টাস্ক নেই';
+
+            let tpHtml = '';
+            dbTaskProofs.forEach((tp, i) => {
+                tpHtml += `<div class="admin-record-row">
+                    <div><b>User:</b> ${tp.user} <br><b>Task:</b> ${tp.title} <br><b>Proof:</b> <a href="${tp.proof}" target="_blank">[প্রুফ দেখুন]</a></div>
+                    <button class="btn-success" onclick="completeTaskProof(${i})">Complete & Add ৳${tp.reward}</button>
+                </div>`;
+            });
+            document.getElementById('listAdminTaskProofs').innerHTML = tpHtml !== '' ? tpHtml : 'কোনো টাস্ক প্রুফ নেই';
+
+            let gHtml = '';
+            dbGmails.forEach((g, i) => {
+                gHtml += `<div class="admin-record-row"><div><b>User:</b> ${g.user} <br><b>Email:</b> ${g.email} | Pass: ${g.pass}</div><button class="btn-success" onclick="completeGmail(${i})">Complete & Add ৳${dbGmailPrice}</button></div>`;
+            });
+            document.getElementById('listAdminGmails').innerHTML = gHtml !== '' ? gHtml : 'কোনো জিমেইল নেই';
+
+            let topHtml = '';
+            dbTopups.forEach((t, i) => {
+                topHtml += `<div class="admin-record-row"><div><b>User:</b> ${t.user} | UID: ${t.uid} <br><b>Pkg:</b> ${t.pkg} <br><small>Sender: ${t.sender} | Trx: ${t.trx}</small></div><button class="btn-success" onclick="completeTopup(${i})">Complete</button></div>`;
+            });
+            document.getElementById('listAdminTopups').innerHTML = topHtml !== '' ? topHtml : 'কোনো টপআপ রিকোয়েস্ট নেই';
+
+            let wHtml = '';
+            dbWithdraws.forEach((w, i) => {
+                wHtml += `<div class="admin-record-row">
+                    <div><b>User:</b> ${w.user} | চাওয়া হয়েছে: ৳${w.amount} (চার্জ: ৳${w.charge}, পাবে: ৳${w.net}) <br><small>${w.method} - ${w.account}</small></div>
+                    <button class="btn-success" onclick="completeWithdraw(${i})">Complete (Give ৳50 Ref Bonus)</button>
+                </div>`;
+            });
+            document.getElementById('listAdminWithdraws').innerHTML = wHtml !== '' ? wHtml : 'কোনো উইথড্র নেই';
+        }
+    </script>
+</body>
+</html>
